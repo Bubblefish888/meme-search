@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>表情包搜索 - 全网表情包在线搜索 | GIF·斗图·熊猫人·猫狗</title>
+<meta name="description" content="免费表情包搜索：热门斗图、熊猫人、猫猫狗狗、明星表情、沙雕GIF。输入关键词即搜，点击复制，微信QQ直接粘贴。">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f172a;color:#e2e8f0}
+header{background:linear-gradient(135deg,#f59e0b,#ef4444,#ec4899);padding:36px 20px;text-align:center}
+header h1{font-size:2em;margin-bottom:8px}
+header p{opacity:.85}
+header input{padding:14px 20px;border-radius:30px;border:none;width:100%;max-width:500px;font-size:1.1em;margin-top:12px;outline:none}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0;justify-content:center}
+.tags button{padding:6px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85em;transition:all .2s}
+.tags button:hover,.tags button.active{background:#ef4444;color:#fff;border-color:#ef4444}
+.meme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.meme-card{background:#1e293b;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;border:1px solid #334155;aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:.9em;line-height:1.5;position:relative}
+.meme-card:hover{border-color:#f59e0b;transform:translateY(-2px)}
+.meme-card img{width:100%;height:100%;object-fit:contain}
+.meme-card .overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:.85em}
+.meme-card:hover .overlay{opacity:1}
+.loading{text-align:center;padding:40px;color:#94a3b8}
+.pay{text-align:center;padding:20px;margin:16px 0}
+.pay img{width:110px;height:110px;border-radius:8px;margin:4px}
+footer{text-align:center;padding:30px;color:#475569;font-size:.8em}
+footer a{color:#f59e0b}
+@media(max-width:640px){.meme-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+</style>
+</head>
+<body>
+<header>
+<h1>😂 表情包搜索</h1>
+<p>输入关键词搜表情包 · 斗图 · GIF · 熊猫人 · 猫狗 · 明星</p>
+<input type="text" id="searchInput" placeholder="🔍 搜表情包，如：摸鱼、干饭、不想上班、猫猫..." onkeydown="if(event.key==='Enter')search()">
+</header>
+<div class="container">
+<div class="tags" id="hotTags"></div>
+<div class="meme-grid" id="memeGrid"></div>
+<div class="loading" id="loading" style="display:none">搜索中...</div>
+<div class="pay">
+<h3 style="margin-bottom:12px">☕ 支持开发者</h3>
+<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+<div><img src="pay/qr-wechat.jpeg" alt="微信"><p style="font-size:.75em;color:#94a3b8">微信</p></div>
+<div><img src="pay/qr-alipay.jpeg" alt="支付宝"><p style="font-size:.75em;color:#94a3b8">支付宝</p></div>
+</div>
+</div>
+<footer><p>© 2026 表情包搜索 · <a href="https://bubblefish888.github.io/">工具站群</a></p></footer>
+</div>
+
+<script>
+const GIPHY_KEY = 'ff0uomx7rgzjsghf4irwzwbwqn00goxm';
+let currentQuery = '';
+
+// Popular Chinese meme search terms
+const HOT_TAGS = ['摸鱼','干饭','不想上班','周一','摆烂','熊猫人','猫猫','狗子','退钱','震惊','离谱','笑死','OK','收到'];
+
+function initTags(){
+  document.getElementById('hotTags').innerHTML = HOT_TAGS.map(t =>
+    `<button onclick="searchTag('${t}')">${t}</button>`
+  ).join('');
+  searchTag(HOT_TAGS[0]);
+}
+initTags();
+
+function searchTag(tag){
+  document.querySelectorAll('.tags button').forEach(b=>b.classList.remove('active'));
+  event?.target?.classList.add('active');
+  currentQuery = tag;
+  document.getElementById('searchInput').value = tag;
+  search();
+}
+
+async function search(){
+  const q = document.getElementById('searchInput').value.trim() || currentQuery || 'meme';
+  currentQuery = q;
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('memeGrid').innerHTML = '';
+
+  try {
+    const resp = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(q)}&limit=30&offset=0&rating=g&lang=zh`);
+    const data = await resp.json();
+    document.getElementById('loading').style.display = 'none';
+
+    if(data.data && data.data.length > 0){
+      document.getElementById('memeGrid').innerHTML = data.data.map(g =>
+        `<div class="meme-card" onclick="copyGif('${g.images.downsized.url}')" title="点击复制链接">
+          <img src="${g.images.fixed_height_downsampled.url}" alt="${g.title}" loading="lazy">
+          <div class="overlay">📋 复制</div>
+        </div>`
+      ).join('');
+    } else {
+      document.getElementById('memeGrid').innerHTML = '<div class="loading">没找到，换个词试试</div>';
+    }
+  } catch(e){
+    document.getElementById('loading').style.display = 'none';
+    // Fallback: show text-based meme suggestions
+    document.getElementById('memeGrid').innerHTML = generateFallbackMemes(q);
+  }
+}
+
+function generateFallbackMemes(q){
+  const memes = [
+    '😭 别说了，已经在哭了',
+    '🤡 小丑竟是我自己',
+    '💀 笑死了笑死了',
+    '🫠 融化了...',
+    '🥹 这谁顶得住啊',
+    '👀 让我看看',
+    '🤝 达成共识',
+    '💪 你可以的！',
+    '🔥 燃起来了',
+    '😎 问题不大',
+    '😂 笑不活了',
+    '🫡 收到！',
+    '🤔 让我想想',
+    '💸 钱呢？？',
+    '👋 再见吧您嘞',
+  ];
+  const picked = memes.sort(()=>Math.random()-0.5).slice(0,10);
+  return picked.map(m =>
+    `<div class="meme-card" onclick="copyText('${m}')">
+      <span style="font-size:2.5em">${m.split(' ')[0]}</span><br>
+      <span style="font-size:.85em;color:#94a3b8">${m.split(' ').slice(1).join(' ')}</span>
+    </div>`
+  ).join('');
+}
+
+function copyGif(url){
+  navigator.clipboard.writeText(url).then(()=>alert('✅ GIF链接已复制！发送到微信/QQ即可'))
+}
+function copyText(text){
+  navigator.clipboard.writeText(text).then(()=>alert('✅ 已复制'))
+}
+</script>
+</body>
+</html>
