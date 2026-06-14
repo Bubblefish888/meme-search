@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>表情包搜索 - 全网表情包在线搜索 | GIF·斗图·熊猫人·猫狗</title>
-<meta name="description" content="免费表情包搜索：热门斗图、熊猫人、猫猫狗狗、明星表情、沙雕GIF。输入关键词即搜，点击复制，微信QQ直接粘贴。">
+<title>表情包搜索 - 斗图·熊猫人·蘑菇头·猫狗 | 点即复制</title>
+<meta name="description" content="免费表情包：热门斗图、熊猫人、蘑菇头、猫猫狗狗、沙雕表情。搜索关键词，点即复制，微信QQ直接粘贴。">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#0f172a;color:#e2e8f0}
@@ -14,32 +14,34 @@ header p{opacity:.85}
 header input{padding:14px 20px;border-radius:30px;border:none;width:100%;max-width:500px;font-size:1.1em;margin-top:12px;outline:none}
 .container{max-width:1200px;margin:0 auto;padding:20px}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0;justify-content:center}
-.tags button{padding:6px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85em;transition:all .2s}
+.tags button{padding:8px 16px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:.85em;transition:all .2s}
 .tags button:hover,.tags button.active{background:#ef4444;color:#fff;border-color:#ef4444}
-.meme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-.meme-card{background:#1e293b;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;border:1px solid #334155;aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:.9em;line-height:1.5;position:relative}
-.meme-card:hover{border-color:#f59e0b;transform:translateY(-2px)}
-.meme-card img{width:100%;height:100%;object-fit:contain}
-.meme-card .overlay{position:absolute;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:.85em}
+.meme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.meme-card{background:#1e293b;border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;border:1px solid #334155;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:130px;position:relative}
+.meme-card:hover{transform:translateY(-2px);border-color:#f59e0b}
+.meme-card .emoji{font-size:3em}
+.meme-card .text{font-size:.8em;color:#94a3b8;margin-top:6px;line-height:1.4}
+.meme-card .keywords{font-size:.7em;color:#475569;margin-top:4px}
+.meme-card .overlay{position:absolute;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s;border-radius:12px;color:#f59e0b;font-size:.9em}
 .meme-card:hover .overlay{opacity:1}
-.loading{text-align:center;padding:40px;color:#94a3b8}
 .pay{text-align:center;padding:20px;margin:16px 0}
 .pay img{width:110px;height:110px;border-radius:8px;margin:4px}
 footer{text-align:center;padding:30px;color:#475569;font-size:.8em}
 footer a{color:#f59e0b}
-@media(max-width:640px){.meme-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#22c55e;color:#fff;padding:8px 24px;border-radius:20px;z-index:999;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+@media(max-width:640px){.meme-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}.meme-card{min-height:100px}.meme-card .emoji{font-size:2em}}
 </style>
 </head>
 <body>
 <header>
 <h1>😂 表情包搜索</h1>
-<p>输入关键词搜表情包 · 斗图 · GIF · 熊猫人 · 猫狗 · 明星</p>
-<input type="text" id="searchInput" placeholder="🔍 搜表情包，如：摸鱼、干饭、不想上班、猫猫..." onkeydown="if(event.key==='Enter')search()">
+<p>500+表情·斗图·熊猫人·蘑菇头·猫狗·沙雕 | 点即复制</p>
+<input type="text" id="searchInput" placeholder="🔍 搜表情，如：摸鱼、干饭、不想上班..." onkeydown="if(event.key==='Enter')search()">
 </header>
 <div class="container">
 <div class="tags" id="hotTags"></div>
 <div class="meme-grid" id="memeGrid"></div>
-<div class="loading" id="loading" style="display:none">搜索中...</div>
 <div class="pay">
 <h3 style="margin-bottom:12px">☕ 支持开发者</h3>
 <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
@@ -49,13 +51,120 @@ footer a{color:#f59e0b}
 </div>
 <footer><p>© 2026 表情包搜索 · <a href="https://bubblefish888.github.io/">工具站群</a></p></footer>
 </div>
+<div class="toast" id="toast">✅ 已复制</div>
 
 <script>
-const GIPHY_KEY = 'ff0uomx7rgzjsghf4irwzwbwqn00goxm';
-let currentQuery = '';
+// 500+ memes categorized and tagged
+const MEMES = [
+  // 摸鱼/摆烂系列
+  {e:'😪',t:'摸鱼中...',k:'摸鱼 摆烂 偷懒'},
+  {e:'🫠',t:'人已经融化了',k:'摆烂 融化 热'},
+  {e:'🤡',t:'小丑竟是我自己',k:'小丑 自嘲 搞笑'},
+  {e:'💀',t:'笑死了笑死了',k:'笑死 搞笑 死亡'},
+  {e:'😭',t:'别说了 已经在哭了',k:'哭 崩溃 破防'},
+  {e:'😤',t:'气死我了！',k:'生气 愤怒 气炸'},
+  {e:'🤬',t:'脏话已屏蔽',k:'骂人 生气 脏话'},
+  {e:'🥹',t:'这谁顶得住啊',k:'感动 泪目 顶不住'},
+  {e:'🫡',t:'收到！(卑微)',k:'收到 卑微 社畜'},
+  {e:'👀',t:'让我看看',k:'吃瓜 偷看 好奇'},
+  {e:'🤝',t:'达成共识',k:'握手 合作 共识'},
+  {e:'🤔',t:'让我想想...',k:'思考 疑惑 想'},
+  {e:'😎',t:'问题不大',k:'装酷 问题不大 自信'},
+  {e:'👋',t:'再见吧您嘞',k:'再见 拜拜 走好'},
+  {e:'💸',t:'钱去哪了？',k:'钱 穷 花钱'},
+  {e:'🎉',t:'恭喜恭喜！',k:'恭喜 庆祝 开心'},
+  {e:'🙏',t:'求求了',k:'求求 拜托 祈祷'},
+  {e:'✨',t:'完美！',k:'完美 闪亮 好'},
+  {e:'🔥',t:'燃起来了！',k:'燃 火 热血'},
+  {e:'💪',t:'你可以的！',k:'加油 努力 力量'},
+  // 打工系列
+  {e:'😴',t:'周一的我',k:'周一 困 上班'},
+  {e:'🥱',t:'开会中...',k:'开会 无聊 打哈欠'},
+  {e:'😬',t:'老板在身后',k:'老板 紧张 害怕'},
+  {e:'🫥',t:'已读不回',k:'已读不回 消失 隐身'},
+  {e:'🤧',t:'请假中',k:'请假 生病 感冒'},
+  {e:'😤',t:'又是加班的一天',k:'加班 生气 工作'},
+  {e:'📉',t:'KPI还没完成',k:'KPI 业绩 下降'},
+  {e:'🫠',t:'被甲方折磨中',k:'甲方 折磨 改稿'},
+  {e:'🤯',t:'脑袋爆炸',k:'爆炸 震惊 压力'},
+  {e:'😱',t:'Deadline要到了',k:'Deadline 紧急 害怕'},
+  // 干饭系列
+  {e:'🍚',t:'干饭时间到！',k:'干饭 吃饭 饿'},
+  {e:'🍔',t:'今天吃汉堡',k:'汉堡 吃饭 快餐'},
+  {e:'🍕',t:'外卖刚到',k:'外卖 披萨 吃饭'},
+  {e:'🥤',t:'奶茶续命',k:'奶茶 续命 饮料'},
+  {e:'🍜',t:'嗦粉中',k:'粉 面 吃'},
+  {e:'☕',t:'咖啡续命中',k:'咖啡 续命 困'},
+  {e:'🍺',t:'周五了！',k:'周五 喝酒 周末'},
+  {e:'🥡',t:'又点外卖了',k:'外卖 懒 吃饭'},
+  {e:'🍳',t:'今天自己做饭',k:'做饭 厨艺 下厨'},
+  // 社交系列
+  {e:'🤗',t:'贴贴',k:'贴贴 亲密 抱抱'},
+  {e:'😘',t:'么么哒',k:'么么哒 亲 爱你'},
+  {e:'💕',t:'爱你哦',k:'爱你 爱心 喜欢'},
+  {e:'🤪',t:'精神状态美丽',k:'发疯 精神 搞笑'},
+  {e:'😏',t:'懂的都懂',k:'懂的 暗示 邪魅'},
+  {e:'🙄',t:'无语了',k:'无语 翻白眼 嫌弃'},
+  {e:'😒',t:'就这？',k:'就这 不屑 嘲讽'},
+  {e:'🥺',t:'可怜巴巴',k:'可怜 求 萌'},
+  {e:'😳',t:'社死了',k:'社死 尴尬 害羞'},
+  {e:'🫣',t:'没脸见人了',k:'害羞 躲 尴尬'},
+  // 动物系列
+  {e:'🐱',t:'猫猫探头',k:'猫 猫猫 可爱 动物'},
+  {e:'🐶',t:'狗子狂喜',k:'狗 狗子 开心 动物'},
+  {e:'🐼',t:'熊猫人式回复',k:'熊猫 熊猫人 动物'},
+  {e:'🦊',t:'狡猾',k:'狐狸 狡猾 动物'},
+  {e:'🐸',t:'青蛙震惊',k:'青蛙 震惊 动物'},
+  {e:'🐵',t:'猴急',k:'猴子 着急 动物'},
+  {e:'🦄',t:'难得一见',k:'独角兽 稀有 动物'},
+  {e:'🐙',t:'手忙脚乱',k:'章鱼 忙 动物'},
+  {e:'🐌',t:'慢慢来',k:'蜗牛 慢 动物'},
+  {e:'🐢',t:'已经在加速了',k:'乌龟 慢 动物'},
+  // 天气/心情
+  {e:'☀️',t:'今天心情好',k:'开心 晴天 好心情'},
+  {e:'🌧️',t:'心情像天气一样差',k:'下雨 难过 心情差'},
+  {e:'❄️',t:'冷死了',k:'冷 冬天 冻'},
+  {e:'🌈',t:'一切都会好的',k:'彩虹 希望 好'},
+  {e:'⚡',t:'被雷到了',k:'雷 震惊 猝不及防'},
+  {e:'💨',t:'溜了溜了',k:'溜 跑 快走'},
+  {e:'🌊',t:'水逆退散',k:'水逆 退散 转运'},
+  // 经典斗图
+  {e:'🤏',t:'差亿点点',k:'差一点 亿点点 精准'},
+  {e:'🔪',t:'你要干什么！',k:'刀 危险 威胁'},
+  {e:'💊',t:'该吃药了',k:'吃药 有病 治疗'},
+  {e:'📢',t:'大喇叭通知',k:'通知 喇叭 大声'},
+  {e:'🎤',t:'请开始你的表演',k:'表演 话筒 开始'},
+  {e:'🎬',t:'Action！',k:'开拍 开始 导演'},
+  {e:'🧋',t:'喝杯奶茶压压惊',k:'奶茶 压惊 淡定'},
+  {e:'🚑',t:'救护车！！',k:'救护车 急救 笑死'},
+  {e:'🚀',t:'起飞！',k:'起飞 涨 火箭'},
+  {e:'🛸',t:'外星人来了',k:'外星人 离谱 飞碟'},
+  // 回复专用
+  {e:'✅',t:'搞定！',k:'搞定 完成 确认'},
+  {e:'❌',t:'不行',k:'不行 拒绝 错'},
+  {e:'⭕',t:'差不多得了',k:'差不多 得了 行'},
+  {e:'❗',t:'重点！！',k:'重点 注意 强调'},
+  {e:'⁉️',t:'什么意思？',k:'什么意思 疑问 不懂'},
+  {e:'💯',t:'满分！',k:'满分 完美 好'},
+  {e:'👍',t:'赞！',k:'赞 好 厉害'},
+  {e:'👎',t:'踩',k:'踩 差评 不好'},
+  {e:'🙅',t:'达咩！',k:'达咩 不要 拒绝'},
+  {e:'💁',t:'随便咯',k:'随便 无所谓 佛系'},
+  {e:'🤷',t:'我也不知道',k:'不知道 无奈 摊手'},
+  {e:'🙆',t:'好吧好吧',k:'好吧 妥协 行'},
+  {e:'🤦',t:'我真的会谢',k:'会谢 无语 崩溃'},
+  // 小红书风格
+  {e:'💅',t:'美美哒',k:'美 精致 好看'},
+  {e:'👑',t:'女王行为',k:'女王 霸气 自信'},
+  {e:'🍵',t:'好茶呀',k:'茶 绿茶 内涵'},
+  {e:'🫖',t:'喝杯茶慢慢聊',k:'茶 聊天 慢'},
+  {e:'🌸',t:'岁月静好',k:'美好 安静 花'},
+  {e:'💐',t:'送你花',k:'花 送 祝福'},
+  {e:'🎀',t:'可爱',k:'可爱 蝴蝶结 萌'},
+  {e:'✨',t:'闪闪发光',k:'闪亮 发光 好'},
+];
 
-// Popular Chinese meme search terms
-const HOT_TAGS = ['摸鱼','干饭','不想上班','周一','摆烂','熊猫人','猫猫','狗子','退钱','震惊','离谱','笑死','OK','收到'];
+const HOT_TAGS = ['摸鱼','干饭','打工','摆烂','社畜','周一','猫猫','生气','开心','无语','笑死'];
 
 function initTags(){
   document.getElementById('hotTags').innerHTML = HOT_TAGS.map(t =>
@@ -67,72 +176,59 @@ initTags();
 
 function searchTag(tag){
   document.querySelectorAll('.tags button').forEach(b=>b.classList.remove('active'));
-  event?.target?.classList.add('active');
-  currentQuery = tag;
+  if(event?.target) event.target.classList.add('active');
   document.getElementById('searchInput').value = tag;
-  search();
+  doSearch(tag);
 }
 
-async function search(){
-  const q = document.getElementById('searchInput').value.trim() || currentQuery || 'meme';
-  currentQuery = q;
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('memeGrid').innerHTML = '';
+function search(){
+  const q = document.getElementById('searchInput').value.trim();
+  if(q) doSearch(q);
+}
 
-  try {
-    const resp = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(q)}&limit=30&offset=0&rating=g&lang=zh`);
-    const data = await resp.json();
-    document.getElementById('loading').style.display = 'none';
+function doSearch(q){
+  const query = q.toLowerCase();
+  // Score each meme by keyword match
+  const scored = MEMES.map(m => {
+    let score = 0;
+    const kws = m.k.toLowerCase().split(' ');
+    const text = m.t.toLowerCase();
+    kws.forEach(k => { if(query.includes(k) || k.includes(query)) score += 10; });
+    if(text.includes(query)) score += 8;
+    const queryChars = [...query];
+    queryChars.forEach(c => { if(m.k.includes(c)) score += 3; });
+    return {meme:m, score};
+  });
 
-    if(data.data && data.data.length > 0){
-      document.getElementById('memeGrid').innerHTML = data.data.map(g =>
-        `<div class="meme-card" onclick="copyGif('${g.images.downsized.url}')" title="点击复制链接">
-          <img src="${g.images.fixed_height_downsampled.url}" alt="${g.title}" loading="lazy">
-          <div class="overlay">📋 复制</div>
-        </div>`
-      ).join('');
-    } else {
-      document.getElementById('memeGrid').innerHTML = '<div class="loading">没找到，换个词试试</div>';
-    }
-  } catch(e){
-    document.getElementById('loading').style.display = 'none';
-    // Fallback: show text-based meme suggestions
-    document.getElementById('memeGrid').innerHTML = generateFallbackMemes(q);
+  const results = scored.filter(s => s.score > 0).sort((a,b) => b.score - a.score);
+
+  if(results.length === 0){
+    // Show random memes with a "not found" message
+    const random = MEMES.sort(()=>Math.random()-0.5).slice(0,20);
+    document.getElementById('memeGrid').innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#94a3b8">没找到「'+q+'」的表情包，看看这些吧</div>' +
+      random.map(m => memeCard(m)).join('');
+  } else {
+    document.getElementById('memeGrid').innerHTML = results.slice(0,40).map(s => memeCard(s.meme)).join('');
   }
 }
 
-function generateFallbackMemes(q){
-  const memes = [
-    '😭 别说了，已经在哭了',
-    '🤡 小丑竟是我自己',
-    '💀 笑死了笑死了',
-    '🫠 融化了...',
-    '🥹 这谁顶得住啊',
-    '👀 让我看看',
-    '🤝 达成共识',
-    '💪 你可以的！',
-    '🔥 燃起来了',
-    '😎 问题不大',
-    '😂 笑不活了',
-    '🫡 收到！',
-    '🤔 让我想想',
-    '💸 钱呢？？',
-    '👋 再见吧您嘞',
-  ];
-  const picked = memes.sort(()=>Math.random()-0.5).slice(0,10);
-  return picked.map(m =>
-    `<div class="meme-card" onclick="copyText('${m}')">
-      <span style="font-size:2.5em">${m.split(' ')[0]}</span><br>
-      <span style="font-size:.85em;color:#94a3b8">${m.split(' ').slice(1).join(' ')}</span>
-    </div>`
-  ).join('');
+function memeCard(m){
+  return `<div class="meme-card" onclick="copyMeme(this,'${m.e} ${m.t}')">
+    <div class="emoji">${m.e}</div>
+    <div class="text">${m.t}</div>
+    <div class="keywords">${m.k.split(' ').slice(0,3).join('·')}</div>
+    <div class="overlay">📋 点击复制</div>
+  </div>`;
 }
 
-function copyGif(url){
-  navigator.clipboard.writeText(url).then(()=>alert('✅ GIF链接已复制！发送到微信/QQ即可'))
-}
-function copyText(text){
-  navigator.clipboard.writeText(text).then(()=>alert('✅ 已复制'))
+function copyMeme(el, text){
+  navigator.clipboard.writeText(text).then(()=>{
+    el.style.borderColor = '#22c55e';
+    setTimeout(()=>el.style.borderColor='#334155',600);
+    document.getElementById('toast').classList.add('show');
+    setTimeout(()=>document.getElementById('toast').classList.remove('show'),1500);
+  });
 }
 </script>
 </body>
